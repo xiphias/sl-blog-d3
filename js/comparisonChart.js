@@ -54,13 +54,14 @@ define([
             .on('zoom', zoomed)
             .on('zoomend', zoomend);
 
+	    var legendSize = 150;
         var margin = {top: 20, right: 20, bottom: 30, left: 50},
-            width = 680 - margin.left - margin.right,
+            width = 680 - margin.left - margin.right - legendSize,
             height = 400 - margin.top - margin.bottom;
 
         // Create svg element
         var svg = d3.select('#chart').classed('chart', true).append('svg')
-            .attr('width', width + margin.left + margin.right)
+            .attr('width', width + margin.left + margin.right + legendSize)
             .attr('height', height + margin.top + margin.bottom);
 
         // Ceate chart
@@ -101,7 +102,7 @@ define([
             .attr('class', 'series')
             .datum(data)
             .call(series);
-
+		
         // Draw axes
         g.append('g')
             .attr('class', 'x axis')
@@ -111,6 +112,17 @@ define([
         g.append('g')
             .attr('class', 'y axis')
             .call(yAxis);
+		
+        var color =  d3.scale.category10().domain(d3.range(10));
+		var gg=svg.append('g')
+		  .attr('transform', 'translate(' + (margin.left+width) + ',' + margin.top + ')');
+		gg.selectAll('rect').data(names).enter().append('rect')
+		  .attr({'x': 10, 'y': function(d, i) {return 15*i;}, 'width':10, 'height': 10})
+		  .style('fill', function(d, i) {return color(i)});
+		var texts=gg.selectAll('text').data(names).enter().append('text')
+		  .attr({'x': 25, 'y': function(d, i) {return 15*i;}, 'width':100, 'height': 10, 'dy': 10, fill: 'black'})
+		  
+		  .text(function(d) {return d});
 
         // Draw gridlines
         plotArea
